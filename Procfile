@@ -1,1 +1,1 @@
-web: gunicorn test51/wsgi.py --log-file -
+web: gunicorn test51.wsgi:application --log-file -
