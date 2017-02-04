@@ -11,7 +11,9 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <h2>51 Prototype Test Site</h2><a href="/accounts/logout/">Logout</a>
+            <h2>51 Prototype Test Site</h2>
+            <a href="/accounts/logout/">Logout</a>
+            <a href="/profile/{{ request.user.id }}/">My Profile</a>
         </div>
         <div class="col-md-6">
             <a style="margin-top: 20px;" href='/admin/cms/post/add/' class="pull-right btn btn-success">New Post</a>
@@ -33,7 +35,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <i>Author: {{ p.author }}</i>
+                        <i>Author: <a href="/profile/{{ p.author.id }}/">{{ p.author }}</a></i>
                     </div>
                     <div class="col-md-12">
                         <i>Date Posted: {{ p.date_created }}</i>
