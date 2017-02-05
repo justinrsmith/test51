@@ -35,15 +35,17 @@
             <div class="list-group">
                 {% for t in tags %}
                     <!--TODO DO NOT DO THIS EVER AGAIN FIX IT -->
-                    <a href="/0/{{ t.id }}/" class="list-group-item {% if t.id == tag %}active{% endif %}">
+                    <a href="/0/{{ t.id }}/" class="list-group-item {% if t.id == tag.id %}active{% endif %}">
                         {{ t.title }}
                     </a>
                 {% endfor %}
             </div>
         </div>
     </div>
-
     <div class="col-md-8 col-md-offset-1">
+        {% if tag %}
+            <h2>{{ tag.title }} posts</h2>
+        {% endif %}
         {% for p in posts %}
             <div class="well row">
                 <div class="row">

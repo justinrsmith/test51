@@ -10,9 +10,8 @@ def home(request, page=None, tag=None):
     if not page:
         return redirect('/1')
     if tag:
-        tag_obj = Tag.objects.get(pk=tag)
-        posts = Post.objects.filter(tags=tag_obj)
-        tag=int(tag)
+        tag = Tag.objects.get(pk=tag)
+        posts = Post.objects.filter(tags=tag)
     else:
         posts = Post.objects.filter(page_id=page).order_by('-date_created')
     pages = Page.objects.all()
