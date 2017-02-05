@@ -21,8 +21,10 @@ from cms import views as cms_views
 
 urlpatterns = [
     url(r'^$', cms_views.home, name='home'),
-    url(r'^profile/(?P<user_id>[0-9]+)/', cms_views.profile, name='profile'),
-    url(r'^admin/', admin.site.urls),
+    url(r'^(?P<page>[0-9]+)/$', cms_views.home, name='home'),
+    url(r'^(?P<page>[0-9]+)/(?P<tag>[0-9]+)/$', cms_views.home, name='home'),
+    url(r'^profile/(?P<user_id>[0-9]+)/$', cms_views.profile, name='profile'),
+    url(r'^/admin/', admin.site.urls),
     url(r'^redactor/', include('redactor.urls')),
     url(r'^accounts/', include('allauth.urls')),
 ]

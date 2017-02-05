@@ -12,5 +12,5 @@ class PostAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(m.Post, PostAdmin)
-admin.site.register(m.Game)
-admin.site.register(m.Team)
+admin.site.register(m.Page)
+admin.site.register(m.Tag)
