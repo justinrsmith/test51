@@ -4,7 +4,7 @@ from cms import models as m
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'date_created')
-    exclude = ('author',)
+    exclude = ('author', 'date_created',)
 
     def save_model(self, request, obj, form, change):
         obj.author = request.user

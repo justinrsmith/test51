@@ -5,7 +5,9 @@ from django.contrib.auth.models import User
 
 
 class Page(models.Model):
-    title = models.CharField(max_length=100)
+    title        = models.CharField(max_length=100)
+    created_by   = models.ForeignKey(User)
+    date_created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.title
