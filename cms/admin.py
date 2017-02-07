@@ -6,14 +6,21 @@ from cms import models as m
 
 class PostForm(forms.ModelForm):
     def clean_slug(self):
+        print(self.instance.id)
         title = self.cleaned_data.get('title', None)
         slug = self.cleaned_data.get('slug', None)
+        page = self.cleaned_data.get('page', None)
         # If user does not provide a slug, slugify the title and
         # validate against that
         if not slug:
             slug = slugify(title)
         try:
             slug_check = m.Post.objects.get(slug=slug)
+            # If we get an object and it is same id as the current
+            # instance being and the slug is the same then we
+            # don't need to validate
+            if slug_check.id == self.instance.id and slug_check.slug==slug:
+                return slug
         except m.Post.DoesNotExist:
             return slug
         if slug_check:
