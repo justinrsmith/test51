@@ -20,13 +20,17 @@ from django.conf import settings
 from cms import views as cms_views
 
 urlpatterns = [
-    url(r'^$', cms_views.home, name='home'),
-    url(r'^(?P<page>[0-9]+)/$', cms_views.home, name='home'),
-    url(r'^(?P<page>[0-9]+)/(?P<tag>[0-9]+)/$', cms_views.home, name='home'),
-    url(r'^profile/(?P<user_id>[0-9]+)/$', cms_views.profile, name='profile'),
     url(r'^admin/', admin.site.urls),
+    url(r'^profile/(?P<user_id>[0-9]+)/$', cms_views.profile, name='profile'),
     url(r'^redactor/', include('redactor.urls')),
     url(r'^accounts/', include('allauth.urls')),
+    url(r'^tags/(?P<tag>[\w\-]+)/$', cms_views.get_tag, name='get_tag'),
+    # User can hit /
+    url(r'^$', cms_views.home, name='home'),
+    # Page slug /home/
+    url(r'^(?P<page>[\w\-]+)/$', cms_views.get_page, name='get_page'),
+    # Get direct article use page slug with post slug for readable url
+    url(r'^(?P<page>[\w\-]+)/(?P<slug>[\w\-]+)/$', cms_views.get_post, name='get_post'),
 ]
 
 urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,26 +1,58 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 from cms.models import Post, Page, Tag
 from allauth.socialaccount.models import SocialAccount
 
 @login_required
-def home(request, page=None, tag=None):
-    if not page:
-        return redirect('/1')
-    if tag:
-        tag = Tag.objects.get(pk=tag)
-        posts = Post.objects.filter(tags=tag)
-    else:
-        posts = Post.objects.filter(page_id=page).order_by('-date_created')
+def home(request):
+    posts = Post.objects.all().order_by('-date_created')
+    pages = Page.objects.all()
+    tags = Tag.objects.all()
+    page = Page.objects.get(title='Home')
+    return render(request, 'index.html', {
+        'posts': posts,
+        'pages': pages,
+        'tags': tags,
+        'page': page.id
+    })
+
+def get_page(request, page):
+    if page=='home':
+        return redirect('/')
+    #TODO: iexact gives case insensitve search
+    page = get_object_or_404(Page, slug__iexact=page)
+    posts = Post.objects.filter(page=page).order_by('-date_created')
     pages = Page.objects.all()
     tags = Tag.objects.all()
     return render(request, 'index.html', {
         'posts': posts,
         'pages': pages,
         'tags': tags,
-        'page': int(page),
+        'page': page.id
+    })
+
+def get_post(request, page, slug):
+    post = get_object_or_404(Post, slug__iexact=slug)
+    pages = Page.objects.all()
+    tags = Tag.objects.all()
+    return render(request, 'post.html', {
+        'post': post,
+        'pages': pages,
+        'tags': tags
+    })
+
+def get_tag(request, tag):
+    tag = get_object_or_404(Tag, title__iexact=tag)
+    posts = Post.objects.filter(tags=tag)
+    pages = Page.objects.all()
+    tags = Tag.objects.all()
+    return render(request, 'index.html', {
+        'posts': posts,
+        'pages': pages,
+        'tags': tags,
         'tag': tag
     })
 
