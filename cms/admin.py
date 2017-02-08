@@ -62,7 +62,19 @@ class PageAdmin(admin.ModelAdmin):
         obj.created_by = request.user
         obj.save()
 
+
+class MatchAdmin(admin.ModelAdmin):
+    class Media:
+        js = ('/static/admin/js/custom_admin.js',)
+
 # Register your models here.
 admin.site.register(m.Post, PostAdmin)
 admin.site.register(m.Page, PageAdmin)
 admin.site.register(m.Tag)
+admin.site.register(m.Game)
+admin.site.register(m.Map)
+admin.site.register(m.Player)
+admin.site.register(m.Team)
+admin.site.register(m.Competition)
+admin.site.register(m.Match, MatchAdmin)
+admin.site.register(m.Result)

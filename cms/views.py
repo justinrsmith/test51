@@ -7,6 +7,8 @@ from allauth.socialaccount.models import SocialAccount
 
 from cms.models import Post, Page, Tag
 
+# Get either an individual post via /page/slug or get a list
+# of posts for the page
 @login_required
 def get_post_or_posts(request, page=None, slug=None):
     # Get the page object and all related post sorted by
@@ -15,13 +17,15 @@ def get_post_or_posts(request, page=None, slug=None):
     try:
         page = Page.objects.get(slug__iexact=page)
         posts = Post.objects.filter(page=page).order_by('-date_created')
-        # If home page get all post desc
+        # If home page get all post by date desc
         if page.is_home_page:
             posts = Post.objects.order_by('-date_created')
         elif slug:
             posts = posts.filter(slug__iexact=slug)
     except Page.DoesNotExist:
+        # Get home page
         page = Page.objects.get(is_home_page=True)
+        # If no page return them to home page
         return redirect('/'+page.slug)
     return render(request, 'index.html', {
         'posts': posts,
