@@ -6,7 +6,6 @@ from cms import models as m
 
 class PostForm(forms.ModelForm):
     def clean_slug(self):
-        print(self.instance.id)
         title = self.cleaned_data.get('title', None)
         slug = self.cleaned_data.get('slug', None)
         page = self.cleaned_data.get('page', None)
@@ -41,7 +40,21 @@ class PostAdmin(admin.ModelAdmin):
         obj.save()
 
 
+class PageForm(forms.ModelForm):
+    def clean_is_home_page(self):
+        is_home_page = self.cleaned_data.get('is_home_page', None)
+        if is_home_page:
+            home_page_exists = m.Page.objects.get(is_home_page=True)
+            if home_page_exists:
+                raise forms.ValidationError('The page %s is already marked as home page.' % home_page_exists.title)
+        return is_home_page
+
+    class Meta:
+        model = m.Page
+        fields = '__all__'
+
 class PageAdmin(admin.ModelAdmin):
+    form = PageForm
     list_display = ('title', 'created_by', 'date_created')
     exclude = ('created_by', 'date_created', 'slug',)
 

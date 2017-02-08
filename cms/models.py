@@ -9,6 +9,7 @@ class Page(models.Model):
     title        = models.CharField(max_length=100, unique=True)
     # show to user?
     slug         = models.SlugField(blank=True, unique=True)
+    is_home_page = models.BooleanField(default=False)
     created_by   = models.ForeignKey(User, null=True, blank=True)
     date_created = models.DateTimeField(default=timezone.now)
 
@@ -47,5 +48,13 @@ class Post(models.Model):
         return self.title
 
 
+class Game(models.Model):
+    pass
+
+
 class Team(models.Model):
+    pass
+
+
+class Match(models.Model):
     pass

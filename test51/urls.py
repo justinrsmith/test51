@@ -26,11 +26,11 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
     url(r'^tags/(?P<tag>[\w\-]+)/$', cms_views.get_tag, name='get_tag'),
     # User can hit /
-    url(r'^$', cms_views.home, name='home'),
+    url(r'^$', cms_views.get_post_or_posts, name='get_post_or_posts'),
     # Page slug /home/
-    url(r'^(?P<page>[\w\-]+)/$', cms_views.get_page, name='get_page'),
+    url(r'^(?P<page>[\w\-]+)/$', cms_views.get_post_or_posts, name='get_post_or_posts'),
     # Get direct article use page slug with post slug for readable url
-    url(r'^(?P<page>[\w\-]+)/(?P<slug>[\w\-]+)/$', cms_views.get_post, name='get_post'),
+    url(r'^(?P<page>[\w\-]+)/(?P<slug>[\w\-]+)/$', cms_views.get_post_or_posts, name='get_post_or_posts'),
 ]
 
 urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

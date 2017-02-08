@@ -3,56 +3,37 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 
-from cms.models import Post, Page, Tag
 from allauth.socialaccount.models import SocialAccount
 
+from cms.models import Post, Page, Tag
+
 @login_required
-def home(request):
-    posts = Post.objects.all().order_by('-date_created')
-    pages = Page.objects.all()
-    tags = Tag.objects.all()
-    page = Page.objects.get(title='Home')
+def get_post_or_posts(request, page=None, slug=None):
+    # Get the page object and all related post sorted by
+    # date created, if the page does not exist return them to
+    # home page
+    try:
+        page = Page.objects.get(slug__iexact=page)
+        posts = Post.objects.filter(page=page).order_by('-date_created')
+        # If home page get all post desc
+        if page.is_home_page:
+            posts = Post.objects.order_by('-date_created')
+        elif slug:
+            posts = posts.filter(slug__iexact=slug)
+    except Page.DoesNotExist:
+        page = Page.objects.get(is_home_page=True)
+        return redirect('/'+page.slug)
     return render(request, 'index.html', {
         'posts': posts,
-        'pages': pages,
-        'tags': tags,
         'page': page.id
     })
 
-def get_page(request, page):
-    if page=='home':
-        return redirect('/')
-    #TODO: iexact gives case insensitve search
-    page = get_object_or_404(Page, slug__iexact=page)
-    posts = Post.objects.filter(page=page).order_by('-date_created')
-    pages = Page.objects.all()
-    tags = Tag.objects.all()
-    return render(request, 'index.html', {
-        'posts': posts,
-        'pages': pages,
-        'tags': tags,
-        'page': page.id
-    })
-
-def get_post(request, page, slug):
-    post = get_object_or_404(Post, slug__iexact=slug)
-    pages = Page.objects.all()
-    tags = Tag.objects.all()
-    return render(request, 'post.html', {
-        'post': post,
-        'pages': pages,
-        'tags': tags
-    })
-
+@login_required
 def get_tag(request, tag):
     tag = get_object_or_404(Tag, title__iexact=tag)
     posts = Post.objects.filter(tags=tag)
-    pages = Page.objects.all()
-    tags = Tag.objects.all()
     return render(request, 'index.html', {
         'posts': posts,
-        'pages': pages,
-        'tags': tags,
         'tag': tag
     })
 
