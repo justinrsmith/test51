@@ -1,6 +1,6 @@
 from rest_framework import serializers, routers, viewsets
 
-from cms.models import Game, Competition, Team, Player, Map
+from cms.models import Game, Competition, Team, Player, Map, TeamPlayer
 
 
 class MapSerializer(serializers.ModelSerializer):
@@ -15,8 +15,15 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TeamPlayerSerializer(serializers.ModelSerializer):
+    player = PlayerSerializer()
+    class Meta:
+        model = TeamPlayer
+        fields = '__all__'
+
+
 class TeamSerializer(serializers.ModelSerializer):
-    players = PlayerSerializer(many=True)
+    teamplayer_set = TeamPlayerSerializer(many=True)
     class Meta:
         model = Team
         fields = '__all__'
@@ -34,11 +41,6 @@ class CompetitionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Competition
         fields = '__all__'
-
-
-
-
-
 
 
 class MapViewSet(viewsets.ModelViewSet):
@@ -69,6 +71,7 @@ class TeamViewSet(viewsets.ModelViewSet):
 class PlayerViewSet(viewsets.ModelViewSet):
     serializer_class = PlayerSerializer
     queryset = Player.objects.all()
+
 
 
 router = routers.DefaultRouter()

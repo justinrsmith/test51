@@ -68,7 +68,6 @@ class Player(models.Model):
     first_name = models.CharField(max_length=25, blank=True)
     last_name = models.CharField(max_length=25, blank=True)
     handle = models.CharField(max_length=30)
-    active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.handle
@@ -78,11 +77,16 @@ class Team(models.Model):
     name = models.CharField(default='Area 51', max_length=20)
     game = models.ForeignKey(Game)
     # TODO show only active players
-    players = models.ManyToManyField(Player)
     active = models.BooleanField(default=True)
 
     def __str__(self):
-        return '%s - %s' % (self.name, self.game.abbreviation)
+        return u'%s - %s' % (self.name, self.game.abbreviation)
+
+
+class TeamPlayer(models.Model):
+    player = models.ForeignKey(Player)
+    team = models.ForeignKey(Team)
+    active = models.BooleanField(default=True)
 
 
 class Competition(models.Model):
@@ -103,3 +107,14 @@ class Match(models.Model):
     team2 = models.ForeignKey(Team, related_name='team2')
     team1_roster = models.ManyToManyField(Player, related_name='team1_roster')
     team2_roster = models.ManyToManyField(Player, related_name='team2_roster')
+
+
+class Result(models.Model):
+    match = models.ForeignKey(Match)
+    map = models.ForeignKey(Map)
+    team1_1st_score = models.IntegerField()
+    team1_2nd_score = models.IntegerField()
+    team1_ot_score = models.IntegerField()
+    team2_1st_score = models.IntegerField()
+    team2_2nd_score = models.IntegerField()
+    team2_ot_score = models.IntegerField()

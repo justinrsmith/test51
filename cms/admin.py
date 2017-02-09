@@ -67,6 +67,14 @@ class MatchAdmin(admin.ModelAdmin):
     class Media:
         js = ('/static/admin/js/custom_admin.js',)
 
+
+class PlayerAdmin(admin.ModelAdmin):
+    search_fields = ('handle', 'first_name', 'last_name',)
+
+class TeamPlayerAdmin(admin.ModelAdmin):
+    raw_id_fields = ['player',]
+    list_display = ('player', 'team', 'active')
+
 # Register your models here.
 admin.site.register(m.Post, PostAdmin)
 admin.site.register(m.Page, PageAdmin)
@@ -74,6 +82,7 @@ admin.site.register(m.Tag)
 admin.site.register(m.Game)
 admin.site.register(m.Competition)
 admin.site.register(m.Team)
-admin.site.register(m.Player)
-admin.site.register(m.Match)
+admin.site.register(m.Player, PlayerAdmin)
+admin.site.register(m.TeamPlayer, TeamPlayerAdmin)
+#admin.site.register(m.Match)
 admin.site.register(m.Map)

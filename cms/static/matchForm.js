@@ -66,10 +66,10 @@ var MatchForm = React.createClass({
             if(obj.id==e.target.value)
                 return obj
         })[0] //should only match on 1
-
+        console.log(selectedTeam)
         this.setState({
             selectedTeam1Id:e.target.value,
-            team1Players: selectedTeam.players
+            selectedTeam1: selectedTeam
         })
     },
     setTeam2: function(e){
@@ -81,7 +81,7 @@ var MatchForm = React.createClass({
 
         this.setState({
             selectedTeam2Id:e.target.value,
-            team2Players: selectedTeam.players
+            selectedTeam2: selectedTeam
         })
     },
     render: function(){
@@ -98,7 +98,7 @@ var MatchForm = React.createClass({
                         value: this.state.selectedGameId
                     },
                         that.state.games.map(function(k, v){
-                            return option({key: 'game-opt-'+v, value:k.id}, k.name+k.id)
+                            return option({key: 'game-opt-'+v, value:k.id}, k.name)
                         })
                     )
                 ),
@@ -128,14 +128,15 @@ var MatchForm = React.createClass({
                         })
                     )
                 ),
-                !this.state.team1Players?null:div({className: 'row'}, label('Team 1 Roster'),
+                !this.state.selectedTeam1?null:div({className: 'row'}, label('Team 1 Roster'),
                     select({
                         key: 'team1-roster-select',
                         className: 'form-control',
                         multiple: true
                     },
-                        that.state.team1Players.map(function(k, v){
-                            return option({key: 'team1-roster-opt-'+v, value:k.id}, k.handle)
+                        that.state.selectedTeam1.teamplayer_set.map(function(k, v){
+                            if(k.active)
+                                return option({key: 'team1-player-opt-'+v, value:k.player.id}, k.player.handle)
                         })
                     )
                 ),
@@ -153,14 +154,15 @@ var MatchForm = React.createClass({
                         })
                     )
                 ),
-                !this.state.team2Players?null:div({className: 'row'}, label('Team 2 Roster'),
+                !this.state.selectedTeam2?null:div({className: 'row'}, label('Team 2 Roster'),
                     select({
                         key: 'team2-roster-select',
                         className: 'form-control',
                         multiple: true
                     },
-                        that.state.team2Players.map(function(k, v){
-                            return option({key: 'team2-roster-opt-'+v, value:k.id}, k.handle)
+                        that.state.selectedTeam2.teamplayer_set.map(function(k, v){
+                            if(k.active)
+                                return option({key: 'team2-roster-opt-'+v, value:k.player.id}, k.player.handle)
                         })
                     )
                 ),
