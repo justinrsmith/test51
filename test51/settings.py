@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.twitch',
     'allauth.socialaccount.providers.discord',
+    'rest_framework',
 
 ]
 

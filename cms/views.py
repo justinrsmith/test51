@@ -57,3 +57,7 @@ def profile(request, user_id):
         'user': user,
         'twitch_acct': twitch_acct
     })
+
+@login_required
+def add_match(request):
+    return render(request, 'add_match.html')

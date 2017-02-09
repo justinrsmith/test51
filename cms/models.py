@@ -65,8 +65,8 @@ class Map(models.Model):
 
 
 class Player(models.Model):
-    first_name = models.CharField(max_length=25)
-    last_name = models.CharField(max_length=25)
+    first_name = models.CharField(max_length=25, blank=True)
+    last_name = models.CharField(max_length=25, blank=True)
     handle = models.CharField(max_length=30)
     active = models.BooleanField(default=True)
 
@@ -77,9 +77,8 @@ class Player(models.Model):
 class Team(models.Model):
     name = models.CharField(default='Area 51', max_length=20)
     game = models.ForeignKey(Game)
-    # Don't require players to be added to field
     # TODO show only active players
-    players = models.ManyToManyField(Player, blank=True)
+    players = models.ManyToManyField(Player)
     active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -88,7 +87,7 @@ class Team(models.Model):
 
 class Competition(models.Model):
     game = models.ForeignKey(Game)
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=40)
     location = models.CharField(max_length=40)
     start_date = models.DateField()
     end_date = models.DateField()
@@ -97,42 +96,10 @@ class Competition(models.Model):
         return self.name
 
 
-class Result(models.Model):
-    map = models.ForeignKey(Map)
-    map_number = models.IntegerField()
-    team_score = models.IntegerField()
-    opposing_score = models.IntegerField()
-
-    def __str__(self):
-        return '%s - %s %s Map-%s' % (
-            self.team_score, self.opposing_score, self.map, self.map_number
-        )
-
-
 class Match(models.Model):
-    MATCH_RESULTS = (
-        ('W', 'Win'),
-        ('L', 'Loss'),
-        ('D', 'Draw'),
-    )
-    MATCH_TYPES = (
-        ('BO1', 'Best of 1'),
-        ('BO3', 'Best of 3'),
-        ('BO5', 'Best of 5'),
-        ('BO7', 'Best of 7'),
-    )
-#    match_type = models.CharField(choices=MATCH_TYPES, max_length=3, default='BO1')
     competition = models.ForeignKey(Competition)
-    #map = models.ForeignKey(Map)
-    match_date = models.DateField(default=timezone.now)
-    team = models.ForeignKey(Team)
-    opponent = models.CharField(max_length=20)
-    results = models.ManyToManyField(Result)
-    #team_score = models.IntegerField()
-    #opposing_score = models.IntegerField()
-    #result = models.CharField(choices=MATCH_RESULTS, max_length=2)
-
-    def __str__(self):
-        return '%s vs %s at %s' % (
-            self.team.name, self.opponent, self.competition.name
-        )
+    date = models.DateField()
+    team1 = models.ForeignKey(Team, related_name='team1')
+    team2 = models.ForeignKey(Team, related_name='team2')
+    team1_roster = models.ManyToManyField(Player, related_name='team1_roster')
+    team2_roster = models.ManyToManyField(Player, related_name='team2_roster')

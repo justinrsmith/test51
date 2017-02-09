@@ -18,12 +18,15 @@ from django.contrib import admin
 from django.conf import settings
 
 from cms import views as cms_views
+import cms.rest_api
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^profile/(?P<user_id>[0-9]+)/$', cms_views.profile, name='profile'),
     url(r'^redactor/', include('redactor.urls')),
     url(r'^accounts/', include('allauth.urls')),
+    url(r'^api/', include(cms.rest_api.router.urls)),
+    url(r'^add_match/', cms_views.add_match, name='add_match'),
     url(r'^tags/(?P<tag>[\w\-]+)/$', cms_views.get_tag, name='get_tag'),
     # User can hit /
     url(r'^$', cms_views.get_post_or_posts, name='get_post_or_posts'),
