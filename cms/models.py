@@ -3,6 +3,7 @@ from redactor.fields import RedactorField
 from django.utils import timezone
 from django.utils.text import slugify
 from django.contrib.auth.models import User
+from collections import defaultdict
 
 
 class Page(models.Model):
@@ -103,18 +104,62 @@ class Competition(models.Model):
 class Match(models.Model):
     competition = models.ForeignKey(Competition)
     date = models.DateField()
-    team1 = models.ForeignKey(Team, related_name='team1')
-    team2 = models.ForeignKey(Team, related_name='team2')
-    team1_roster = models.ManyToManyField(Player, related_name='team1_roster')
-    team2_roster = models.ManyToManyField(Player, related_name='team2_roster')
+    
+    def get_maps(self):
+        return len(self.matchmap_set.all())
+
+    # Get the winner of a match regardless of maps play
+    def get_winner(self):
+        # Get all the maps in the set
+        match_maps = self.matchmap_set.all()
+        # Dictionary to hold the results of the series by map
+        results = {}
+        # Dict that will be used to store the number of map wins by team
+        maps_won = {}
+        for mm in match_maps:
+            # Get the results for the map
+            results[mm.map] = {}
+            for result in mm.matchmapteamresult_set.all():
+                # Build map final score for team
+                final_score = (result.first_half_score
+                               + result.second_half_score
+                               + result.overtime_score)
+                # Initate the maps_won for team to be 0
+                maps_won[result.team] = 0
+                results[mm.map][result.team] = final_score
+        for k,v in results.items():
+            if v:
+                # Get team who had highest score for map
+                max_key = max(v, key=lambda k: v[k])
+                # Increment maps won
+                maps_won[max_key] += 1
+        # Get who had the most maps won
+        max_key = max(maps_won, key=lambda k: maps_won[k])
+        return max_key
 
 
-class Result(models.Model):
+class MatchMap(models.Model):
     match = models.ForeignKey(Match)
     map = models.ForeignKey(Map)
-    team1_1st_score = models.IntegerField()
-    team1_2nd_score = models.IntegerField()
-    team1_ot_score = models.IntegerField()
-    team2_1st_score = models.IntegerField()
-    team2_2nd_score = models.IntegerField()
-    team2_ot_score = models.IntegerField()
+
+    def __str__(self):
+        return self.map.name
+
+
+class MatchMapTeamResult(models.Model):
+    match_map = models.ForeignKey(MatchMap)
+    team = models.ForeignKey(Team)
+    fielded_roster = models.ManyToManyField(TeamPlayer)
+    first_half_score = models.IntegerField()
+    second_half_score = models.IntegerField()
+    overtime_score = models.IntegerField()
+
+#class TeamResult(models.Model):
+    #match_team = models.MatchTeam(MatchTeam)
+
+#    team = models.ForeignKey(Team)
+
+
+    #def team_score(self):
+    #    team_score = self.first_half_score + self.second_half_score + overtime_score
+    #    return team_score

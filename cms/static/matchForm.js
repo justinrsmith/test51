@@ -3,8 +3,8 @@ var MatchForm = React.createClass({
         return {
             selectedGameId: 0,
             selectedCompetitionId: 0,
-            selectedTeam1Id: 0,
-            selectedTeam2Id: 0,
+            team1: 0,
+            team2: 0,
             results: []
         }
     },
@@ -13,7 +13,8 @@ var MatchForm = React.createClass({
     },
     addResult: function(){
         var results = this.state.results
-        results.push({})
+        var id = results.length + 1
+        results.push({id: {}})
         this.setState({results: results})
     },
     fetchCompetitions: function(url){
@@ -49,6 +50,95 @@ var MatchForm = React.createClass({
     parseTeams: function(d){
         this.setState({teams: d})
     },
+    saveMatch: function(){
+        console.log(this.state.date)
+        var final_data = {}
+        final_data['competition'] = this.state.selectedCompetitionId
+        final_data['date'] = this.state.date
+        console.log(this.state.results)
+        /*var i = 0
+        while(true){
+            console.log()
+        }*/
+
+        var data ={
+            "matchmap_set": [
+                {
+                    "matchmapteamresult_set": [
+                        {
+                            "first_half_score": 3,
+                            "second_half_score": 9,
+                            "overtime_score": 0,
+                            "match_map": 1,
+                            "team": 7,
+                            "fielded_roster": [
+                                5
+                            ]
+                        },
+                        {
+                            "first_half_score": 3,
+                            "second_half_score": 13,
+                            "overtime_score": 0,
+                            "match_map": 1,
+                            "team": 8,
+                            "fielded_roster": [
+                                6
+                            ]
+                        }
+                    ],
+                    "map": 1
+                },
+                {
+                    "matchmapteamresult_set": [
+                    	{
+                            "first_half_score": 3,
+                            "second_half_score": 9,
+                            "overtime_score": 0,
+                            "match_map": 2,
+                            "team": 7,
+                            "fielded_roster": [
+                                5
+                            ]
+                        },
+                        {
+                            "first_half_score": 3,
+                            "second_half_score": 13,
+                            "overtime_score": 0,
+                            "match_map": 2,
+                            "team": 8,
+                            "fielded_roster": [
+                                6
+                            ]
+                        }
+                    ],
+                    "map": 2
+                },
+                {
+                    "matchmapteamresult_set": [],
+                    "map": 4
+                }
+            ],
+            "date": "2017-02-09",
+            "competition": 1
+        }
+        /*var that = this
+        request('/api/matches/', {
+            method: 'POST',
+            alterRequest: function(r){
+                r.setRequestHeader('content-type', 'application/json')
+                r.setRequestHeader('X-CSRFToken', that.props.csrf)
+                return r
+            },
+            data: JSON.stringify(data),
+            success: function(){
+                conosle.log('hi')
+            }
+        })*/
+    },
+    setDate: function(e){
+        console.log(e.target.value)
+        this.setState({date: e.target.value})
+    },
     setGame: function(e){
         var selectedGame= this.state.games.filter(function(obj){
             if(obj.id==e.target.value)
@@ -68,7 +158,6 @@ var MatchForm = React.createClass({
         })[0] //should only match on 1
         console.log(selectedTeam)
         this.setState({
-            selectedTeam1Id:e.target.value,
             selectedTeam1: selectedTeam
         })
     },
@@ -80,9 +169,15 @@ var MatchForm = React.createClass({
         })[0] //should only match on 2
 
         this.setState({
-            selectedTeam2Id:e.target.value,
             selectedTeam2: selectedTeam
         })
+    },
+    setMap: function(i){
+        console.log(this.state.results[i])
+        this.state.results[i].map = this.refs['map-'+i].value
+        console.log(this.state.results[i])
+        console.log(this.refs['map-'+i].value)
+//console.log(e, i)
     },
     render: function(){
         var that = this
@@ -113,6 +208,15 @@ var MatchForm = React.createClass({
                             return option({key: 'comp-opt-'+v, value:k.id}, k.name)
                         })
                     )
+                ),
+                div({className: 'row'}, label('Date'),
+                    // Competition select
+                    // Populates based on game selection
+                    input({
+                        className: 'form-control',
+                        type: 'date',
+                        onChange: this.setDate
+                    })
                 ),
                 div({className: 'row'}, label('Team 1'),
                     // Team select
@@ -174,6 +278,14 @@ var MatchForm = React.createClass({
                         onClick: this.addResult
                     }, 'Add a Result')
                 ),
+                div({className: 'row'},
+                    // Team select
+                    // Gets roster when a team is selected
+                    a({
+                        className: 'btn btn-primary',
+                        onClick: this.saveMatch
+                    }, 'Save Match')
+                ),
                 !this.state.results.length?null:
                     table({className: 'table'},
                         thead(
@@ -184,12 +296,14 @@ var MatchForm = React.createClass({
                             )
                         ),
                         tbody(
-                            this.state.results.map(function(obj){
+                            this.state.results.map(function(obj, i){
                                 return tr(
                                     td(
                                         select({
                                             key: 'team2-roster-select',
-                                            className: 'form-control'
+                                            className: 'form-control',
+                                            onChange: that.setMap.bind(that, i),
+                                            ref: 'map-'+i
                                         },
                                             that.state.selectedGame.map_set.map(function(k, v){
                                                 return option({key: 'map-opt-'+v, value:k.id}, k.name)
@@ -200,6 +314,7 @@ var MatchForm = React.createClass({
                                         input({
                                             className: 'form-control',
                                             placeholder: '1st Half',
+                                            ref: 'team1-first_half-'+i,
                                             style: {
                                                 'width': '100px'
                                             }
@@ -207,6 +322,7 @@ var MatchForm = React.createClass({
                                         input({
                                             className: 'form-control',
                                             placeholder: '2nd Half',
+                                            ref: 'team1-second_half-'+i,
                                             style: {
                                                 'width': '100px'
                                             }
@@ -214,6 +330,7 @@ var MatchForm = React.createClass({
                                         input({
                                             className: 'form-control',
                                             placeholder: 'Overtime',
+                                            ref: 'team1-overtime-'+i,
                                             style: {
                                                 'width': '100px'
                                             }
@@ -223,6 +340,7 @@ var MatchForm = React.createClass({
                                         input({
                                             className: 'form-control',
                                             placeholder: '1st Half',
+                                            ref: 'team2-first_half-'+i,
                                             style: {
                                                 'width': '100px'
                                             }
@@ -230,6 +348,7 @@ var MatchForm = React.createClass({
                                         input({
                                             className: 'form-control',
                                             placeholder: '2nd Half',
+                                            ref: 'team2-second_half-'+i,
                                             style: {
                                                 'width': '100px'
                                             }
@@ -237,6 +356,7 @@ var MatchForm = React.createClass({
                                         input({
                                             className: 'form-control',
                                             placeholder: 'Overtime',
+                                            ref: 'team2-overtime-'+i,
                                             style: {
                                                 'width': '100px'
                                             }

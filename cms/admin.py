@@ -71,6 +71,7 @@ class MatchAdmin(admin.ModelAdmin):
 class PlayerAdmin(admin.ModelAdmin):
     search_fields = ('handle', 'first_name', 'last_name',)
 
+
 class TeamPlayerAdmin(admin.ModelAdmin):
     raw_id_fields = ['player',]
     list_display = ('player', 'team', 'active')
@@ -84,5 +85,10 @@ admin.site.register(m.Competition)
 admin.site.register(m.Team)
 admin.site.register(m.Player, PlayerAdmin)
 admin.site.register(m.TeamPlayer, TeamPlayerAdmin)
-#admin.site.register(m.Match)
+
 admin.site.register(m.Map)
+
+
+admin.site.register(m.Match)
+admin.site.register(m.MatchMap)
+admin.site.register(m.MatchMapTeamResult)

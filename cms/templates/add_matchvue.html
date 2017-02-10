@@ -1,0 +1,247 @@
+{% load static %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js">
+
+</script>
+<div class="container">
+    <div class="col-md-8">
+        <form class="form-group" action="index.html" method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="">Game</label>
+                    <select class="form-control" name="" id="select_game">
+                        <option value=""></option>
+                        {% for g in games %}
+                            <option value="{{ g.id }}">{{ g.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="">Competition</label>
+                    <select class="form-control" name="" id="select_comp">
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            <input type="date" name="" value="" id="match_date">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="">Area 51 Team</label>
+                    <select class="form-control" name="" id="team">
+                        <option value=""></option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="">Opposing Team</label>
+                    <select class="form-control" name="" id="opponent">
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="">Area 51 Roster</label>
+                    <select multiple class="form-control" name="" id="team_roster">
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="">Opposing Team Roster</label>
+                    <select multiple class="form-control" name="" id="opponent_roster">
+                    </select>
+                </div>
+            </div>
+
+            <a class="btn btn-primary" id="add_map">Add Map</a>
+            <a class="btn btn-primary" id="submit_match">Submit</a>
+            <table class="table" id="results_table">
+                <thead>
+                    <tr>
+                        <th>Map</th>
+                        <th id="team_header"></th>
+                        <th id="opponent_header"></th>
+                    </tr>
+                </thead>
+                <tbody id="map_body">
+
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <h4>Recent Matches</h4>
+        {% for m in matches %}
+            <div class="row">
+                Winner: {{m.get_winner}}
+            </div>
+            <h6>Maps Played</h6>
+            {% for map in m.matchmap_set.all %}
+                {{map}}
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    // using jQuery
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
+    var map_counter = 0
+    $(document).on('change', '#select_game', function(){
+        var game_id = $(this).val()
+        test_global = $(this).val()
+        $.getJSON('/api/competitions/?game='+game_id, function(data){
+        })
+            .success(function(d){
+                d.forEach(function(obj){
+                    $('#select_comp').append(
+                        '<option value="'+obj.id+'">'+obj.name+'</option>'
+                    )
+                })
+            })
+
+        $.getJSON('/api/teams/', function(){
+        })
+            .success(function(d){
+                d.forEach(function(obj){
+                    $('#team').append(
+                        '<option value="'+obj.id+'">'+obj.name+'</option>'
+                    )
+                    $('#opponent').append(
+                        '<option value="'+obj.id+'">'+obj.name+'</option>'
+                    )
+                })
+            })
+    })
+    $(document).on('change', '#select_comp', function(){
+        console.log($(this).val())
+        COMPETITION = $(this).val()
+    })
+    $(document).on('change', '#team', function(){
+        $('#team_header').append($("#team option:selected").text())
+        var team_id = $("#team option:selected").val()
+        $.getJSON('/api/teamplayers/?team='+team_id, function(){
+        })
+            .success(function(d){
+                d.forEach(function(obj){
+                    $('#team_roster').append(
+                        '<option value='+obj.id+'>'+obj.player.handle+'</option>'
+                    )
+                })
+
+            })
+    })
+    $(document).on('change', '#opponent', function(){
+        $('#opponent_header').append($("#opponent option:selected").text())
+        var team_id = $("#opponent option:selected").val()
+        $.getJSON('/api/teamplayers/?team='+team_id, function(){
+        })
+            .success(function(d){
+                d.forEach(function(obj){
+                    $('#opponent_roster').append(
+                        '<option value='+obj.id+'>'+obj.player.handle+'</option>'
+                    )
+                })
+
+            })
+    })
+    $(document).on('click', '#add_map', function(){
+        map_counter += 1
+        $.getJSON('/api/maps/', function(){
+        })
+            .success(function(d){
+                $('#map_body').append(
+                    '<tr id=map-'+map_counter+'>'+
+                        '<td>'+
+                            '<select id="match_map">'+
+                                d.map(function(obj){
+                                    return '<option value='+obj.id+'>'+obj.name+'</option>'
+                                })+
+                            '</select>'+
+                        '</td>'+
+                        '<td>'+
+                            '<input class="team_one" id="first_half_score" placeholder="First Half Score" value="0">'+
+                            '<input class="team_one" id="second_half_score" placeholder="Second Half Score" value="0">'+
+                            '<input class="team_one" id="overtime_score" placeholder="Overtime Score" value="0">'+
+                        '</td>'+
+                        '<td>'+
+                            '<input class="team_two" id="first_half_score" placeholder="First Half Score" value="0">'+
+                            '<input class="team_two" id="second_half_score" placeholder="Second Half Score" value="0">'+
+                            '<input class="team_two" id="overtime_score" placeholder="Overtime Score" value="0">'+
+                        '</td>'+
+                    '</tr>'
+                )
+            })
+    })
+    $(document).on('click', '#submit_match', function(e){
+        e.preventDefault()
+        var final_data = {}
+        final_data['competition'] = $('#select_comp').val()
+        final_data['date'] = $('#match_date').val()
+        final_data['matchmap_set'] = []
+        console.log(map_counter)
+        // loop through each map added
+        for (var i = 1; i <= map_counter; i++) {
+            console.log('hi')
+            var map_id = $('#map-'+i).find('select#match_map').val()
+            final_data['matchmap_set'].push({
+                'map': map_id,
+                'matchmapteamresult_set': []
+            })
+            var team_data = {}
+            $('#map-'+i).find('input.team_one').each(function(){
+                team_data[$(this).attr('id')] = $(this).val()
+                team_data['fielded_roster'] = $('#team_roster').val()
+                team_data['team'] = $('#team').val()
+            })
+            var opponent_data = {}
+            $('#map-'+i).find('input.team_two').each(function(){
+                opponent_data[$(this).attr('id')] = $(this).val()
+                opponent_data['fielded_roster'] = $('#opponent_roster').val()
+                opponent_data['team'] = $('#opponent').val()
+            })
+            final_data['matchmap_set'][i-1]['matchmapteamresult_set'].push(team_data)
+            final_data['matchmap_set'][i-1]['matchmapteamresult_set'].push(opponent_data)
+        }
+        console.log(final_data)
+        var csrftoken = getCookie('csrftoken');
+        $.ajax({
+            type: "POST",
+            url: "/api/matches/",
+            data: JSON.stringify(final_data),
+            success: function() { console.log("Success!"); },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            crossDomain:false,
+            beforeSend: function(xhr, settings) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        });
+        location.reload()
+    })
+</script>
+<script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>

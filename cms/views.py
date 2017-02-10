@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 
 from allauth.socialaccount.models import SocialAccount
 
-from cms.models import Post, Page, Tag
+from cms.models import Post, Page, Tag, Game, Competition, Match
 
 # Get either an individual post via /page/slug or get a list
 # of posts for the page
@@ -60,4 +60,11 @@ def profile(request, user_id):
 
 @login_required
 def add_match(request):
-    return render(request, 'add_match.html')
+    matches = Match.objects.all()
+    games = Game.objects.all()
+    match = Match.objects.first()
+
+    return render(request, 'add_matchjq.html', {
+        'matches': matches,
+        'games': games
+    })
