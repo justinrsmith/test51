@@ -65,7 +65,7 @@
 
             <a class="btn btn-primary" id="add_map">Add Map</a>
             <a class="btn btn-primary" id="submit_match">Submit</a>
-            <table class="table" id="results_table">
+            <table class="table" id="results_table" style="display:none">
                 <thead>
                     <tr>
                         <th>Map</th>
@@ -132,14 +132,18 @@
         })
             .success(function(d){
                 d.forEach(function(obj){
-                    $('#team').append(
-                        '<option value="'+obj.id+'">'+obj.name+'</option>'
-                    )
-                    $('#opponent').append(
-                        '<option value="'+obj.id+'">'+obj.name+'</option>'
-                    )
+                    if(obj.is_area_51)
+                        $('#team').append(
+                            '<option value="'+obj.id+'">'+obj.name+'</option>'
+                        )
+                    else{
+                        $('#opponent').append(
+                            '<option value="'+obj.id+'">'+obj.name+'</option>'
+                        )
+                    }
                 })
             })
+        console.log($('#team').children('option').length)
     })
     $(document).on('change', '#select_comp', function(){
         console.log($(this).val())
@@ -175,27 +179,29 @@
     })
     $(document).on('click', '#add_map', function(){
         map_counter += 1
+        if(map_counter<=1)
+            $('#results_table').toggle()
         $.getJSON('/api/maps/', function(){
         })
             .success(function(d){
                 $('#map_body').append(
                     '<tr id=map-'+map_counter+'>'+
                         '<td>'+
-                            '<select id="match_map">'+
+                            '<select class="form-control" id="match_map">'+
                                 d.map(function(obj){
                                     return '<option value='+obj.id+'>'+obj.name+'</option>'
                                 })+
                             '</select>'+
                         '</td>'+
                         '<td>'+
-                            '<input class="team_one" id="first_half_score" placeholder="First Half Score" value="0">'+
-                            '<input class="team_one" id="second_half_score" placeholder="Second Half Score" value="0">'+
-                            '<input class="team_one" id="overtime_score" placeholder="Overtime Score" value="0">'+
+                            '<input class="form-control team_one" id="first_half_score" placeholder="First Half Score">'+
+                            '<input class="form-control team_one" id="second_half_score" placeholder="Second Half Score">'+
+                            '<input class="form-control team_one" id="overtime_score" placeholder="Overtime Score">'+
                         '</td>'+
                         '<td>'+
-                            '<input class="team_two" id="first_half_score" placeholder="First Half Score" value="0">'+
-                            '<input class="team_two" id="second_half_score" placeholder="Second Half Score" value="0">'+
-                            '<input class="team_two" id="overtime_score" placeholder="Overtime Score" value="0">'+
+                            '<input class="form-control team_two" id="first_half_score" placeholder="First Half Score">'+
+                            '<input class="form-control team_two" id="second_half_score" placeholder="Second Half Score">'+
+                            '<input class="form-control team_two" id="overtime_score" placeholder="Overtime Score">'+
                         '</td>'+
                     '</tr>'
                 )
@@ -207,10 +213,8 @@
         final_data['competition'] = $('#select_comp').val()
         final_data['date'] = $('#match_date').val()
         final_data['matchmap_set'] = []
-        console.log(map_counter)
         // loop through each map added
         for (var i = 1; i <= map_counter; i++) {
-            console.log('hi')
             var map_id = $('#map-'+i).find('select#match_map').val()
             final_data['matchmap_set'].push({
                 'map': map_id,
@@ -218,20 +222,19 @@
             })
             var team_data = {}
             $('#map-'+i).find('input.team_one').each(function(){
-                team_data[$(this).attr('id')] = $(this).val()
+                team_data[$(this).attr('id')] = !$(this).val()?0:$(this).val()
                 team_data['fielded_roster'] = $('#team_roster').val()
                 team_data['team'] = $('#team').val()
             })
             var opponent_data = {}
             $('#map-'+i).find('input.team_two').each(function(){
-                opponent_data[$(this).attr('id')] = $(this).val()
+                opponent_data[$(this).attr('id')] = !$(this).val()?0:$(this).val()
                 opponent_data['fielded_roster'] = $('#opponent_roster').val()
                 opponent_data['team'] = $('#opponent').val()
             })
             final_data['matchmap_set'][i-1]['matchmapteamresult_set'].push(team_data)
             final_data['matchmap_set'][i-1]['matchmapteamresult_set'].push(opponent_data)
         }
-        console.log(final_data)
         var csrftoken = getCookie('csrftoken');
         $.ajax({
             type: "POST",

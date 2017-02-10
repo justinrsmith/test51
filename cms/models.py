@@ -78,7 +78,7 @@ class Team(models.Model):
     name = models.CharField(default='Area 51', max_length=20)
     game = models.ForeignKey(Game)
     # TODO show only active players
-    active = models.BooleanField(default=True)
+    is_area_51 = models.BooleanField(default=False)
 
     def __str__(self):
         return u'%s - %s' % (self.name, self.game.abbreviation)
@@ -104,7 +104,7 @@ class Competition(models.Model):
 class Match(models.Model):
     competition = models.ForeignKey(Competition)
     date = models.DateField()
-    
+
     def get_maps(self):
         return len(self.matchmap_set.all())
 
