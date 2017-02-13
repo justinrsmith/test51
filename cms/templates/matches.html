@@ -1,0 +1,47 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10">
+            {% for m in matches %}
+                <div class="well">
+                    <div class="row">
+                        <div class="col-md-2 match_comp">
+                            {{ m.competition }}
+                        </div>
+                        <div class="col-md-3 col-md-offset-2">
+                            <p class="pull-right">{% if m.get_results.team == m.get_results.winner %}<strong>{{ m.get_results.team }}</strong>{% else %}{{ m.get_results.team }}{% endif %}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <p class="text-center">
+                                <strong>{{ m.get_results.team_final_score }}-{{ m.get_results.opponent_final_score }}</strong>
+                                <br>
+                                {% if m.get_results.team_first_half_score %}
+                                    (
+                                        {{ m.get_results.team_first_half_score }}:{{ m.get_results.opponent_first_half_score }},
+                                        {{ m.get_results.team_second_half_score }}:{{ m.get_results.opponent_second_half_score }}
+                                    )
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <p class="pull-left">{% if m.get_results.opponent == m.get_results.winner %}<strong>{{ m.get_results.opponent }}</strong>{% else %}{{ m.get_results.opponent }}{% endif %}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 match_game">
+                            {{ m.competition.game }} <strong>/</strong> {{ m.date }}
+                        </div>
+                        <div class="col-md-">
+
+                        </div>
+                    </div>
+                </div>
+
+            {% endfor %}
+        </div>
+        <div class="col-md-2">
+            <a style="margin-top: 20px;" href='/add_match/' class="pull-right btn btn-success">Add Match</a>
+        </div>
+    </div>
+</div>

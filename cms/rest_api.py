@@ -88,6 +88,12 @@ class CompetitionViewSet(viewsets.ModelViewSet):
 class TeamViewSet(viewsets.ModelViewSet):
     serializer_class = TeamSerializer
     queryset = Team.objects.all()
+    def get_queryset(self):
+        game = self.request.query_params.get('game', None)
+        queryset = Team.objects.all()
+        if game:
+            queryset = Team.objects.filter(game__id=game)
+        return queryset
 
 
 class PlayerViewSet(viewsets.ModelViewSet):
@@ -114,11 +120,23 @@ class MatchViewSet(viewsets.ModelViewSet):
         # Get competition object to pass to match object being created
         competition = validated_data.data.pop('competition')
         competition = Competition.objects.get(pk=competition)
+        team = validated_data.data.pop('team')
+        team = Team.objects.get(pk=team)
+        opponent = validated_data.data.pop('opponent')
+        opponent = Team.objects.get(pk=opponent)
+        team_roster = validated_data.data.pop('team_roster')
+        opponent_roster = validated_data.data.pop('opponent_roster')
         # Create match object
         match = Match.objects.create(
             competition=competition,
+            team=team,
+            opponent=opponent,
             **validated_data.data
         )
+        for tr in team_roster:
+            match.team_roster.add(tr)
+        for opp in opponent_roster:
+            match.opponent_roster.add(opp)
         # Loop through maps being played
         for mm in matchmap_set:
             matchmapteamresult_set =  mm.pop('matchmapteamresult_set')
@@ -132,19 +150,20 @@ class MatchViewSet(viewsets.ModelViewSet):
                 map=map
             )
             for mmtr in matchmapteamresult_set:
+                print(mmtr)
             #    match_mapold = mmtr.pop('match_map')
                 team = mmtr.pop('team')
                 team = Team.objects.get(pk=team)
-                fielded_roster = mmtr.pop('fielded_roster')
+            #    fielded_roster = mmtr.pop('fielded_roster')
                 match_map_team_result = MatchMapTeamResult.objects.create(
                     match_map=match_map,
                     team=team,
                     **mmtr
                 )
-                for fr in fielded_roster:
-                    match_map_team_result.fielded_roster.add(fr)
+            #    for fr in fielded_roster:
+            #        match_map_team_result.fielded_roster.add(fr)
 
-        return Response(match)
+        return match
 
 
 router = routers.DefaultRouter()

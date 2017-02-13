@@ -68,3 +68,10 @@ def add_match(request):
         'matches': matches,
         'games': games
     })
+
+@login_required
+def get_matches(request):
+    matches = Match.objects.order_by('-date', '-datetime_submitted')
+    return render(request, 'matches.html', {
+        'matches': matches
+    })

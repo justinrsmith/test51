@@ -128,7 +128,7 @@
                 })
             })
 
-        $.getJSON('/api/teams/', function(){
+        $.getJSON('/api/teams/?game='+game_id, function(){
         })
             .success(function(d){
                 d.forEach(function(obj){
@@ -143,11 +143,6 @@
                     }
                 })
             })
-        console.log($('#team').children('option').length)
-    })
-    $(document).on('change', '#select_comp', function(){
-        console.log($(this).val())
-        COMPETITION = $(this).val()
     })
     $(document).on('change', '#team', function(){
         $('#team_header').append($("#team option:selected").text())
