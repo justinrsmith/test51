@@ -139,7 +139,7 @@ class Match(models.Model):
             results.append(result)
         # If match is a series
         if len(results)>1:
-            # Intialize dict just incase no one wins a map, since they
+            # Intialize dict just in case no one wins a map, since they
             # won't get returned using Counter collection
             result={}
             result['team'] = self.team
