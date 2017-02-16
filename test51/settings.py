@@ -31,7 +31,6 @@ ALLOWED_HOSTS = ['proto51.herokuapp.com', 'localhost', '127.0.0.1', '10.6.31.76'
 # Application definition
 
 INSTALLED_APPS = [
-
     'contests',
     'django.contrib.admin',
     'django.contrib.auth',

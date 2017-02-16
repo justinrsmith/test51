@@ -12,6 +12,8 @@ class ContestEntryForm(forms.ModelForm):
         if kwargs.get('social_provider', None):
             self.social_provider = kwargs.pop('social_provider')
         super(ContestEntryForm, self).__init__(*args, **kwargs)
+        for f in self.fields:
+            self.fields[f].widget.attrs.update({'class': 'form-control'})
 
     def clean(self):
         email = self.cleaned_data.get('email', None)

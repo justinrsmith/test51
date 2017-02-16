@@ -1,5 +1,4 @@
 {% load socialaccount %}
-{% load area_tags %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -79,7 +78,7 @@
                                             <label style="for=">Full Name</label>
                                         </div>
                                         <div class="col-md-8">
-                                            {% add_attr form.full_name class="form-control" %}
+                                            {{ form.full_name }}
                                             {% if form.full_name.errors %}
                                                 <span class="help-block">{{ form.full_name.errors.as_text }}</span>
                                             {% endif %}
@@ -93,7 +92,7 @@
                                             <label for="">Email</label>
                                         </div>
                                         <div class="col-md-8">
-                                            {% add_attr form.email class="form-control" %}
+                                            {{ form.email }}
                                             {% if form.email.errors %}
                                                 <span class="help-block">{{ form.email.errors.as_text }}</span>
                                             {% endif %}
