@@ -95,6 +95,7 @@ WSGI_APPLICATION = 'test51.wsgi.application'
 #    }
 #}
 import dj_database_url
+DATABASES = {}
 DATABASES['default'] =  dj_database_url.config()
 
 
