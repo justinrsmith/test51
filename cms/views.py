@@ -27,7 +27,7 @@ def get_post_or_posts(request, page=None, slug=None):
         page = Page.objects.get(is_home_page=True)
         # If no page return them to home page
         return redirect('/'+page.slug)
-    return render(request, 'index.html', {
+    return render(request, 'cms/index.html', {
         'posts': posts,
         'page': page.id
     })
@@ -36,7 +36,7 @@ def get_post_or_posts(request, page=None, slug=None):
 def get_tag(request, tag):
     tag = get_object_or_404(Tag, title__iexact=tag)
     posts = Post.objects.filter(tags=tag)
-    return render(request, 'index.html', {
+    return render(request, 'cms/index.html', {
         'posts': posts,
         'tag': tag
     })
@@ -53,7 +53,7 @@ def profile(request, user_id):
     except:
         pass
 
-    return render(request, 'profile.html', {
+    return render(request, 'cms/profile.html', {
         'user': user,
         'twitch_acct': twitch_acct
     })
@@ -64,7 +64,7 @@ def add_match(request):
     games = Game.objects.all()
     match = Match.objects.first()
 
-    return render(request, 'add_matchjq.html', {
+    return render(request, 'cms/add_matchjq.html', {
         'matches': matches,
         'games': games
     })
@@ -72,6 +72,6 @@ def add_match(request):
 @login_required
 def get_matches(request):
     matches = Match.objects.order_by('-date', '-datetime_submitted')
-    return render(request, 'matches.html', {
+    return render(request, 'cms/matches.html', {
         'matches': matches
     })

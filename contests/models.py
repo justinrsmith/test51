@@ -5,14 +5,21 @@ from django.utils import timezone
 
 from allauth.socialaccount import models as all_auth_models
 
+def graphic_file_path(instance, imagename):
+    # file will be uploaded to MEDIA_ROOT/<contest.name>/<imagename>/
+    return '{0}/{1}'.format(instance.name, imagename)
+
 # Create your models here.
 class Contest(models.Model):
     name = models.CharField(max_length=50)
-    #description
+    graphic = models.ImageField(upload_to=graphic_file_path, blank=True, null=True)
+    description = models.TextField()
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    #header graphic
-    #show entries
+
+    def __str__(self):
+        return self.name
+        
 
 class ContestEntry(models.Model):
     contest = models.ForeignKey(Contest)

@@ -48,6 +48,7 @@ class PageForm(forms.ModelForm):
                 home_page_exists = m.Page.objects.get(is_home_page=True)
                 raise forms.ValidationError('The page %s is already marked as home page.' % home_page_exists.title)
             except m.Page.DoesNotExist:
+                print(is_home_page)
                 return is_home_page
 
     class Meta:
@@ -60,6 +61,8 @@ class PageAdmin(admin.ModelAdmin):
     exclude = ('created_by', 'date_created', 'slug',)
 
     def save_model(self, request, obj, form, change):
+        if not obj.is_home_page:
+            obj.is_home_page = False
         obj.created_by = request.user
         obj.save()
 
