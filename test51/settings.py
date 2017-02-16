@@ -31,6 +31,8 @@ ALLOWED_HOSTS = ['proto51.herokuapp.com', 'localhost', '127.0.0.1', '10.6.31.76'
 # Application definition
 
 INSTALLED_APPS = [
+
+    'contests',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,8 +47,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.twitch',
     'allauth.socialaccount.providers.discord',
+    'allauth.socialaccount.providers.twitter',
     'rest_framework',
-
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -145,8 +148,22 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 SOCIALACCOUNT_PROVIDERS = {
-        "twitch": {"SCOPE": ["user_read"]},
+        'twitch': {'SCOPE': ['user_read']},
+        'google': {
+            'SCOPE': [
+                'profile',
+                'email',
+            ],
+            'AUTH_PARAMS': {
+                'access_type': 'online',
+        }
+    }
 }
+
+ACCOUNT_UNIQUE_EMAIL = False
+ACCOUNT_EMAIL_VERIFICATION = None
 SITE_ID = 2
 #TODO this was for a connection refused error so come back and review this
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+LOGIN_REDIRECT_URL = '/contest_entry'

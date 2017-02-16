@@ -44,10 +44,11 @@ class PageForm(forms.ModelForm):
     def clean_is_home_page(self):
         is_home_page = self.cleaned_data.get('is_home_page', None)
         if is_home_page:
-            home_page_exists = m.Page.objects.get(is_home_page=True)
-            if home_page_exists:
+            try:
+                home_page_exists = m.Page.objects.get(is_home_page=True)
                 raise forms.ValidationError('The page %s is already marked as home page.' % home_page_exists.title)
-        return is_home_page
+            except m.Page.DoesNotExist:
+                return is_home_page
 
     class Meta:
         model = m.Page

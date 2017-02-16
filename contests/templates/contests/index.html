@@ -1,0 +1,118 @@
+{% load socialaccount %}
+{% load 51_tags %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <style media="screen">
+
+        </style>
+    </head>
+    <body>
+        <div class="container" style="margin-top: 100px">
+            <div class="col-md-6 col-md-offset-3 well">
+                <div class="row">
+                    <div class="col-md-12">
+                        {% if messages %}
+                            {% for message in messages %}
+                                    <div class="main-alert alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                        {% if form.non_field_errors %}
+                            {% for err in form.non_field_errors %}
+                                <div class="alert alert-danger" role="alert">{{ err }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="page-header" style="margin-top: 0px;">
+                            <h2  style="margin-top: 0px;">AREA 51 Launch Contest</h2>
+                            {% if not form %}<small>Use one of the methods below to enter our giveaway!</small>{% endif %}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="page-header" style="margin-top: 0px;">
+                        <small>{{ contest_entries|length }} Entries so far</small>
+                    </div>
+                </div>
+                {% if not form %}
+                    <div class="row text-center">
+                        <div class="col-md-8 col-md-offset-2">
+                            <a style="color:white; background-color: #6441a5" href="{% provider_login_url "twitch" %}" class="btn btn-default btn-lg btn-block">Enter with my Twitch account</a>
+                        </div>
+                        <div class="col-md-8 col-md-offset-2">
+                            <a style="color:white; background-color: rgba(114, 137, 218, 1) !important"   href="{% provider_login_url "discord" %}" class="btn-default btn-lg btn-block">Enter with my Discord account</a>
+                        </div>
+                        <div class="col-md-8 col-md-offset-2">
+                            <a style="color:white; background-color: #1DA1F2 !important"  href="{% provider_login_url "twitter" %}"class="btn-default btn-lg btn-block">Enter with my Twitter account</a>
+                        </div>
+                        <div class="col-md-8 col-md-offset-2">
+                            <a style="color:white; background-color: #d14836 !important"  href="{% provider_login_url "google" %}" class="btn-default btn-lg btn-block">Enter with my Google account</a>
+                        </div>
+                        <div class="col-md-8 col-md-offset-2">
+                            <a class="btn btn-default btn-lg btn-block" href="/contest_entry/?email=True">Enter with my Email</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-info" role="alert">
+                                {% if service_entered_with == 'email' %}
+                                    Please enter your information in the form below.
+                                {% else %}
+                                    Please verify the information from your
+                                    <strong>{{ service_entered_with }}</strong>
+                                    account is accurate.
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10 col-md-offset-1">
+                            <form class="" action="/contest_entry/" method="post" novalidate>
+                                {% csrf_token %}
+                                <div class="form-group {% if form.full_name.errors %}has-error{% endif %}">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label style="for=">Full Name</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {% add_attr form.full_name class="form-control" %}
+                                            {% if form.full_name.errors %}
+                                                <span class="help-block">{{ form.full_name.errors.as_text }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label for="">Email</label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            {% add_attr form.email class="form-control" %}
+                                            {% if form.email.errors %}
+                                                <span class="help-block">{{ form.email.errors.as_text }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <a class="btn btn-default" href='/'>Return to Contest Page</a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button class="btn btn-primary pull-right" type="submit" name="button">Enter Contest</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </body>
+</html>
